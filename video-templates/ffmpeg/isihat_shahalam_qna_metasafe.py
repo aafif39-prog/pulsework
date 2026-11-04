@@ -17,7 +17,7 @@ TEAL = (46, 156, 147)    # #2E9C93 logo teal
 MINT = (198, 238, 205)   # light green
 GOLD = (242, 187, 68)    # #F2BB44 headline gold
 WHITE = (255, 255, 255)
-PHONE = "017-846 3321"   # Klang Valley HQ line - CONFIRM Shah Alam number
+PHONE = "017-744 6302"   # same WhatsApp as the I-SIHAT Cheras video
 SKIP_VIDEO = os.environ.get("SKIP_VIDEO") == "1"
 
 def run(cmd):
@@ -89,6 +89,32 @@ if not SKIP_VIDEO:
     open("work/alist.txt", "w").write("".join(f"file '{os.path.basename(p)}'\n" for p in aparts))
     run("ffmpeg -v error -y -f concat -safe 0 -i work/vlist.txt -c copy work/base.mp4")
     run("ffmpeg -v error -y -f concat -safe 0 -i work/alist.txt -c copy work/voice.wav")
+
+# ---------------- B-roll cutaways (I-SIHAT footage; clean top area of the Oct-26 braces ads) ----------------
+# (timeline start, duration, source, source in, crop x:y:w:h)
+BROLL = [
+    (4.2, 1.8, "broll/ads_oct26_1.mp4", 17.0, "562:1000:259:0"),   # 3D bracket close-up  - "jenis braces"
+    (15.5, 1.9, "broll/ads_oct26_1.mp4", 29.0, "562:1000:259:0"),  # modern braces in mouth - "tak ada jarum"
+    (21.0, 2.6, "broll/ads_oct26_1.mp4", 14.1, "562:1000:259:0"),  # smile with metal braces - "ngilu sikit"
+    (27.1, 2.25, "broll/ads_oct26_3.mp4", 19.0, "562:1000:259:0"), # brackets moving teeth - "gigi dah start bergerak"
+    (32.6, 1.8, "raw/c3.mp4", 12.6, "iw:ih:0:0"),                   # I-SIHAT wall logo - "klinik I-SIHAT"
+    (36.3, 1.9, "broll/ads_oct26_1.mp4", 31.0, "562:1000:259:0"),  # digital X-ray / scan - "full consultation"
+]
+if not SKIP_VIDEO or not os.path.exists("work/base_b.mp4"):
+    ins, fcb, last = "", "", "0:v"
+    for k, (t0, d, src, sin, crop) in enumerate(BROLL):
+        cw_, ch_, cx, cy = crop.split(":")
+        geo_b = (f"crop={cw_}:{ch_}:{cx}:{cy}," if crop != "iw:ih:0:0" else "") + \
+                f"scale={W}:{H}:force_original_aspect_ratio=increase:flags=lanczos,crop={W}:{H}"
+        run(f"ffmpeg -v error -y -ss {sin} -i {src} -t {d} -an -vf \"fps={FPS},{geo_b},"
+            f"scale=w='trunc({W}*(1+0.05*t/{d})/2)*2':h=-2:eval=frame,crop={W}:{H},setsar=1,{grade},format=yuv420p\" "
+            f"-c:v libx264 -preset fast -crf 16 work/br{k}.mp4")
+        ins += f" -i work/br{k}.mp4"
+        fcb += (f"[{k+1}:v]setpts=PTS-STARTPTS+{t0}/TB,format=yuv420p,fade=t=in:st={t0}:d=0.12:alpha=1[b{k}];"
+                f"[{last}][b{k}]overlay=0:0:eof_action=pass:enable='between(t,{t0},{t0+d})'[o{k}];")
+        last = f"o{k}"
+    run(f"ffmpeg -v error -y -i work/base.mp4{ins} -filter_complex \"{fcb[:-1].rsplit('[', 1)[0]}[vb]\" -map \"[vb]\" "
+        f"-c:v libx264 -preset fast -crf 16 -pix_fmt yuv420p work/base_b.mp4")
 
 # ---------------- logo ----------------
 logo = Image.open("brand/logo_isihat.png").convert("RGBA")
@@ -201,7 +227,6 @@ d = ImageDraw.Draw(card_im)
 hs = 100
 while d.textlength("BRACES", font=sF("Inter-Black.otf", hs)) > 520 * S: hs -= 2
 d.text((30 * S, 74 * S), "BRACES", font=sF("Inter-Black.otf", hs), fill=DEEP)
-d.text((36 * S, 180 * S), "Pelan ansuran · Konsultasi penuh · Book dulu", font=sF("Inter-SemiBold.otf", 23), fill=DEEP)
 bx0, by0, bx1, by1 = 590 * S, 32 * S, 970 * S, 176 * S
 d.rounded_rectangle((bx0, by0, bx1, by1), 24 * S, fill=GREEN)
 fb = sF("Inter-Black.otf", 40)
@@ -316,7 +341,7 @@ print("\n".join(" ".join(x["t"] for x in ch) for ch in chunks))
 # ---------------- composite ----------------
 ease_b = f"{BANNER_Y}-60*pow(1-min(max((t-{HOOK_END})/0.5,0),1),3)"
 def pop(t0): return f"pow(1-min(max((t-{t0})/0.3,0),1),3)"
-inputs = [f"-i work/base.mp4", "-i work/logo_small.png",
+inputs = [f"-i work/base_b.mp4", "-i work/logo_small.png",
           f"-loop 1 -framerate {FPS} -t {HOOK_END} -i work/hook1.png",
           f"-loop 1 -framerate {FPS} -t {HOOK_END} -i work/hook2.png",
           f"-loop 1 -framerate {FPS} -t {END_START} -i work/banner.png",
@@ -363,7 +388,7 @@ fc += (
     f"[vo][mud][sfx]amix=inputs=3:duration=longest:normalize=0,alimiter=limit=0.89,"
     f"atrim=0:{TOTAL},afade=t=out:st={TOTAL-1.5}:d=1.5[au]"
 )
-OUT = "ISIHAT_ShahAlam_Braces_QnA_v1.mp4"
+OUT = "ISIHAT_ShahAlam_Braces_QnA_v2.mp4"
 run(f"ffmpeg -v error -y {' '.join(inputs)} -filter_complex \"{fc}\" -map \"[v]\" -map \"[au]\" -t {TOTAL} "
     f"-c:v libx264 -preset medium -crf 18 -profile:v high -pix_fmt yuv420p -r {FPS} "
     f"-c:a aac -b:a 192k -ar 48000 -movflags +faststart {OUT}")
