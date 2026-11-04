@@ -81,7 +81,6 @@ if not SKIP_VIDEO:
 # never sits on a question read, and dissolves in/out (XF seconds).
 XF = 0.35
 BROLL = [
-    (14.3, 2.9, "broll/ads_oct26_1.mp4", 13.85, 0.85, "562:1000:259:0"),  # smile w/ metal braces - "if you're looking for braces"
 ]
 CARD = (5.85, 6.3, "work/tablet_card.png", 895)  # tablet photo: "macam dalam gambar ini ... | Jadi ini akan..." (covers the jump cut)
 if not SKIP_VIDEO or not os.path.exists("work/base_b.mp4"):
@@ -380,7 +379,7 @@ fc += (
     f"[vo][mud][sfx]amix=inputs=3:duration=longest:normalize=0,alimiter=limit=0.89,"
     f"atrim=0:{TOTAL},afade=t=out:st={TOTAL-1.5}:d=1.5[au]"
 )
-OUT = "ISIHAT_Sentul_Braces_BukanSekadarCantik_v1.mp4"
+OUT = "ISIHAT_Sentul_Braces_BukanSekadarCantik_v2.mp4"
 run(f"ffmpeg -v error -y {' '.join(inputs)} -filter_complex \"{fc}\" -map \"[v]\" -map \"[au]\" -t {TOTAL} "
     f"-c:v libx264 -preset medium -crf 18 -profile:v high -pix_fmt yuv420p -r {FPS} "
     f"-c:a aac -b:a 192k -ar 48000 -movflags +faststart {OUT}")
