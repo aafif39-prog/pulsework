@@ -56,13 +56,12 @@ d.text((970 * S, 46 * S), "TEETH WHITENING", font=sF("Inter-Black.otf", 40), fil
 # left: price block (the hero)
 px0, py0, px1, py1 = 26 * S, 84 * S, 440 * S, 214 * S
 d.rounded_rectangle((px0, py0, px1, py1), 24 * S, fill=PINK2)
-d.text(((px0 + px1) / 2, py0 + 14 * S), "NOVEMBER PROMO", font=sF("Inter-ExtraBold.otf", 19), fill=WHITE, anchor="ma")
 fp, fr, fc = sF("Inter-Black.otf", 74), sF("Inter-Black.otf", 34), sF("Inter-ExtraBold.otf", 24)
 pw, rw, cw2 = d.textlength("269", font=fp), d.textlength("RM", font=fr), d.textlength("/cycle", font=fc)
 x = (px0 + px1 - (rw + 8 * S + pw + 8 * S + cw2)) / 2
-d.text((x, py0 + 56 * S), "RM", font=fr, fill=WHITE); x += rw + 8 * S
-d.text((x, py0 + 38 * S), "269", font=fp, fill=WHITE); x += pw + 8 * S
-d.text((x, py0 + 72 * S), "/cycle", font=fc, fill=WHITE)
+d.text((x, py0 + 38 * S), "RM", font=fr, fill=WHITE); x += rw + 8 * S
+d.text((x, py0 + 20 * S), "269", font=fp, fill=WHITE); x += pw + 8 * S
+d.text((x, py0 + 54 * S), "/cycle", font=fc, fill=WHITE)
 # right: perks checklist (2 x 2)
 perks = ["Scaling & polishing", "Cleaner teeth", "Healthier gums", "Fresher breath"]
 fpk = sF("Inter-ExtraBold.otf", 22)
