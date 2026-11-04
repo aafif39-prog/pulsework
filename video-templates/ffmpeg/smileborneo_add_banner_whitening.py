@@ -35,7 +35,7 @@ def shadowed(im, blur=16, off=8, alpha=110, pad=30):
     out.alpha_composite(im, (pad, pad)); return out
 
 # ---- banner card, drawn at 3x ----
-CW, CH, S = 1000, 240, 3
+CW, CH, S = 1000, 250, 3
 cw, ch = CW * S, CH * S
 def sF(n, s): return F(n, s * S)
 mask = Image.new("L", (cw, ch), 0)
@@ -51,38 +51,33 @@ for poly_base, amp, ph, col, al in ((ch - 30 * S, 7 * S, 0.4, YELLOW, 120), (ch 
     body.paste(Image.new("RGBA", (cw, ch), col + (255,)), (0, 0), m)
 card = Image.new("RGBA", (cw, ch), (0, 0, 0, 0)); card.paste(body, (0, 0), mask)
 d = ImageDraw.Draw(card)
-# left: headline
-hs = 72
-while d.textlength("WHITENING", font=sF("Inter-Black.otf", hs)) > 400 * S: hs -= 2
-d.text((30 * S, 74 * S + (72 - hs) * S // 2), "WHITENING", font=sF("Inter-Black.otf", hs), fill=GREEN)
-d.text((34 * S, 164 * S), "Teeth whitening", font=sF("Inter-Bold.otf", 24), fill=GREEN)
-# right: two price boxes (as in the static)
-x0, x1 = 455 * S, 972 * S
-def pricebox(y0, y1, fill, small, price, small_col, price_col, note=None):
-    d.rounded_rectangle((x0, y0, x1, y1), 22 * S, fill=fill)
-    fs, fr, fp = sF("Inter-ExtraBold.otf", 19), sF("Inter-Black.otf", 26), sF("Inter-Black.otf", 50)
-    # small label on the left, "RM" + number on the right
-    ty = y0 + (y1 - y0) // 2
-    lines = small.split("\n")
-    lh = 22 * S
-    sy = ty - lh * len(lines) // 2 - (9 * S if note else 0)
-    for i, l in enumerate(lines):
-        d.text((x0 + 22 * S, sy + i * lh), l, font=fs, fill=small_col)
-    pw = d.textlength(price, font=fp); rw = d.textlength("RM", font=fr)
-    px = x1 - 22 * S - pw
-    d.text((px, ty - 32 * S - (8 * S if note else 0)), price, font=fp, fill=price_col)
-    d.text((px - rw - 6 * S, ty - 26 * S - (8 * S if note else 0)), "RM", font=fr, fill=price_col)
-    if note:
-        fn = sF("Inter-Bold.otf", 16)
-        d.text(((x0 + x1) / 2, y1 - 23 * S), note, font=fn, fill=WHITE, anchor="ma")
-d.rounded_rectangle((x0, 20 * S, x1, 70 * S), 18 * S, fill=GREEN)
-d.text(((x0 + x1) / 2, 45 * S), "Cleaner teeth · Healthier gums · Fresher breath", font=sF("Inter-ExtraBold.otf", 18), fill=WHITE, anchor="mm")
-pricebox(80 * S, 208 * S, PINK2, "NOVEMBER\n1 CYCLE\nWHITENING", "269", WHITE, WHITE, note="Includes scaling & polishing")
+# top row: headline on the right of the logo (logo pasted after downscale)
+d.text((970 * S, 46 * S), "TEETH WHITENING", font=sF("Inter-Black.otf", 40), fill=GREEN, anchor="rm")
+# left: price block (the hero)
+px0, py0, px1, py1 = 26 * S, 84 * S, 440 * S, 214 * S
+d.rounded_rectangle((px0, py0, px1, py1), 24 * S, fill=PINK2)
+d.text(((px0 + px1) / 2, py0 + 14 * S), "NOVEMBER PROMO", font=sF("Inter-ExtraBold.otf", 19), fill=WHITE, anchor="ma")
+fp, fr, fc = sF("Inter-Black.otf", 74), sF("Inter-Black.otf", 34), sF("Inter-ExtraBold.otf", 24)
+pw, rw, cw2 = d.textlength("269", font=fp), d.textlength("RM", font=fr), d.textlength("/cycle", font=fc)
+x = (px0 + px1 - (rw + 8 * S + pw + 8 * S + cw2)) / 2
+d.text((x, py0 + 56 * S), "RM", font=fr, fill=WHITE); x += rw + 8 * S
+d.text((x, py0 + 38 * S), "269", font=fp, fill=WHITE); x += pw + 8 * S
+d.text((x, py0 + 72 * S), "/cycle", font=fc, fill=WHITE)
+# right: perks checklist (2 x 2)
+perks = ["Scaling & polishing", "Cleaner teeth", "Healthier gums", "Fresher breath"]
+fpk = sF("Inter-ExtraBold.otf", 22)
+cx0, cy0, colw, rowh = 462 * S, 100 * S, 272 * S, 58 * S
+for i, p in enumerate(perks):
+    x = cx0 + (i % 2) * colw; y = cy0 + (i // 2) * rowh
+    r = 15 * S
+    d.ellipse((x, y, x + 2 * r, y + 2 * r), fill=GREEN)
+    d.line([(x + 8 * S, y + 15 * S), (x + 13 * S, y + 21 * S), (x + 23 * S, y + 9 * S)], fill=YELLOW, width=4 * S, joint="curve")
+    d.text((x + 2 * r + 10 * S, y + r), p, font=fpk, fill=GREEN, anchor="lm")
 rim = Image.new("RGBA", (cw, ch), (0, 0, 0, 0))
 ImageDraw.Draw(rim).rounded_rectangle((S, S, cw - 1 - S, ch - 1 - S), 30 * S, outline=(255, 255, 255, 170), width=2 * S)
 card.alpha_composite(rim)
 card = card.resize((CW, CH), Image.LANCZOS)
-card.alpha_composite(logo_w(205), (30, 18))
+card.alpha_composite(logo_w(210), (28, 20))
 bn = shadowed(card)
 bn.save("work/banner.png")
 BX, BY = (W - bn.width) // 2, SAFE_TOP - 30
