@@ -1,0 +1,21 @@
+{
+  "name": "tlow-remotion-metasafe",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "still": "remotion still src/index.ts Main",
+    "render": "remotion render src/index.ts Main ../work/video.mp4 --codec=h264 --crf=17 --muted"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@remotion/bundler": "^4.0.540",
+    "@remotion/cli": "^4.0.540",
+    "@remotion/renderer": "^4.0.540",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "remotion": "^4.0.540"
+  }
+}

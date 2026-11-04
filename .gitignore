@@ -1,0 +1,11 @@
+node_modules/
+work/
+raw/
+brand/
+public/
+*.mp4
+*.mov
+*.MOV
+*.wav
+*.m4a
+*.pcm
