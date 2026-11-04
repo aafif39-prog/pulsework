@@ -27,6 +27,14 @@ The old template put the price banner in the bottom 500px, so the CTA button cov
 - Add a thin white outline (alpha ~170) around the card so it reads cleanly over busy footage.
 - Logo cut-out: slightly blur and boost the alpha edge, so the edge isn't crunchy.
 
+## B-roll rules
+- Use fewer, longer cutaways (about 3–3.5s each, roughly one per answer), not many 2s flashes.
+- Dissolve in and out (0.35s alpha fade over the talking head). Don't hard-cut.
+- Place each cutaway over a jump cut in the talking head so it hides the cut. Start and end on a phrase break, and never during a question read or the hook.
+- Use one continuous shot per cutaway. Detect the cuts in the source first (`ffmpeg -vf "select='gt(scene,0.25)',showinfo"`) and trim off any flash/transition frames.
+- Slow short shots to 0.6–0.85x with frame blending (`setpts` + `framerate`) rather than stretching past 0.55x. Add a light push-in (1.0→1.04).
+- When borrowing from older ads, crop only the clean area (no old captions or banners) and use only that clinic's own footage.
+
 ## Brand kits
 **T.LOW Dental Clinic:** navy `#0C2354`, blue `#155ED6`, cyan `#28BED2` (active caption word), lime `#C6E83A`. WhatsApp **+60 17 613 9754** (client-confirmed). www.tlowdentalclinic.com, SS2 Petaling Jaya. Logo is from the brand sheet "T.LOW.jpg" (crop 820x360 at 390,120), with the white background removed.
 
