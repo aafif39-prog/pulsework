@@ -18,7 +18,7 @@ TEAL = (46, 156, 147)    # #2E9C93 logo teal
 MINT = (198, 238, 205)   # light green
 GOLD = (242, 187, 68)    # #F2BB44 headline gold
 WHITE = (255, 255, 255)
-PHONE = "017-379 4120"   # Setapak number shown on the clinic door in the video
+PHONE = "017-744 6302"   # I-SIHAT WhatsApp (as in the other I-SIHAT videos)
 SKIP_VIDEO = os.environ.get("SKIP_VIDEO") == "1"
 
 def run(cmd):
@@ -389,7 +389,7 @@ fc += (
     f"[vo][mud][sfx]amix=inputs=3:duration=longest:normalize=0,alimiter=limit=0.89,"
     f"atrim=0:{TOTAL},afade=t=out:st={TOTAL-1.5}:d=1.5[au]"
 )
-OUT = "ISIHAT_Setapak_Braces_MetalVsCeramic_v1.mp4"
+OUT = "ISIHAT_Setapak_Braces_MetalVsCeramic_v2.mp4"
 run(f"ffmpeg -v error -y {' '.join(inputs)} -filter_complex \"{fc}\" -map \"[v]\" -map \"[au]\" -t {TOTAL} "
     f"-c:v libx264 -preset medium -crf 18 -profile:v high -pix_fmt yuv420p -r {FPS} "
     f"-c:a aac -b:a 192k -ar 48000 -movflags +faststart {OUT}")
