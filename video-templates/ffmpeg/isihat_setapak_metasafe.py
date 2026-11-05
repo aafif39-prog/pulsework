@@ -78,6 +78,10 @@ if not SKIP_VIDEO:
     open("work/vlist.txt", "w").write("".join(f"file '{os.path.basename(p)}'\n" for p in parts))
     open("work/alist.txt", "w").write("".join(f"file '{os.path.basename(p)}'\n" for p in aparts))
     run("ffmpeg -v error -y -f concat -safe 0 -i work/vlist.txt -c copy work/base.mp4")
+    VOICE = ("highpass=f=85,aresample=48000,arnndn=m=models/sh.rnnn:mix=0.92,afftdn=nr=8:nf=-45,"
+             "equalizer=f=250:t=q:w=1.2:g=-2.5,equalizer=f=3200:t=q:w=1.0:g=3,highshelf=f=9000:g=2,deesser=i=0.35,"
+             "acompressor=threshold=-22dB:ratio=2.5:attack=8:release=150:makeup=2,agate=threshold=0.012:range=0.08:ratio=3:attack=5:release=250")
+    run(f"ffmpeg -v error -y -i raw/setapak.mov -vn -ac 1 -af \"{VOICE}\" -ar 48000 work/a_setapak.wav")  # RNNoise voice clean-up
     run(f"ffmpeg -v error -y -ss {SPAN[0]} -i work/a_setapak.wav -t {SPAN[1]-SPAN[0]:.3f} -af \"afade=t=out:st={SPAN[1]-SPAN[0]-0.08:.3f}:d=0.08\" work/voice.wav")
 
 # ---------------- B-roll cutaways (I-SIHAT footage; clean top area of the Oct-26 braces ads) ----------------
@@ -383,13 +387,13 @@ for kind, at in sfx_times:
 fc += "".join(sl) + f"amix=inputs={len(sl)}:normalize=0,aformat=channel_layouts=stereo[sfx];"
 fc += (
     f"[6:a]acompressor=threshold=-20dB:ratio=3:attack=5:release=120,"
-    f"loudnorm=I=-14.0:TP=-1.5:LRA=9,aresample=44100,aformat=channel_layouts=stereo,asplit=2[vo][vosc];"
+    f"loudnorm=I=-11.0:TP=-1.5:LRA=9,aresample=44100,aformat=channel_layouts=stereo,asplit=2[vo][vosc];"
     f"[7:a]volume=0.30,aformat=channel_layouts=stereo[mu];"
     f"[mu][vosc]sidechaincompress=threshold=0.05:ratio=2.5:attack=40:release=500[mud];"
     f"[vo][mud][sfx]amix=inputs=3:duration=longest:normalize=0,alimiter=limit=0.89,"
     f"atrim=0:{TOTAL},afade=t=out:st={TOTAL-1.5}:d=1.5[au]"
 )
-OUT = "ISIHAT_Setapak_Braces_MetalVsCeramic_v2.mp4"
+OUT = "ISIHAT_Setapak_Braces_MetalVsCeramic_v3.mp4"
 run(f"ffmpeg -v error -y {' '.join(inputs)} -filter_complex \"{fc}\" -map \"[v]\" -map \"[au]\" -t {TOTAL} "
     f"-c:v libx264 -preset medium -crf 18 -profile:v high -pix_fmt yuv420p -r {FPS} "
     f"-c:a aac -b:a 192k -ar 48000 -movflags +faststart {OUT}")

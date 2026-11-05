@@ -27,6 +27,11 @@ The old template put the price banner in the bottom 500px, so the CTA button cov
 - Add a thin white outline (alpha ~170) around the card so it reads cleanly over busy footage.
 - Logo cut-out: slightly blur and boost the alpha edge, so the edge isn't crunchy.
 
+## Voice clean-up (RNNoise)
+For noisy rooms, use ffmpeg's RNNoise denoiser with the model in `models/sh.rnnn` (from GregorR/rnnoise-models):
+`highpass=f=85,aresample=48000,arnndn=m=models/sh.rnnn:mix=0.92,afftdn=nr=8:nf=-45,equalizer=f=250:t=q:w=1.2:g=-2.5,equalizer=f=3200:t=q:w=1.0:g=3,highshelf=f=9000:g=2,deesser=i=0.35,acompressor=threshold=-22dB:ratio=2.5:attack=8:release=150:makeup=2,agate=threshold=0.012:range=0.08:ratio=3:attack=5:release=250`
+On Setapak this took the pause noise from about −54dB to about −90dB (voice-to-noise from about 16dB to about 52dB). The gate lowers the measured loudness, so check the final mix and adjust the loudnorm target until it reads about −14 LUFS.
+
 ## B-roll rules
 - Use fewer, longer cutaways (about 3–3.5s each, roughly one per answer), not many 2s flashes.
 - Dissolve in and out (0.35s alpha fade over the talking head). Don't hard-cut.
