@@ -29,8 +29,8 @@ def F(name, size): return ImageFont.truetype(FD + name, size)
 
 # ---------------- shots: (clip, in, out, look) ----------------
 # look: "w" wide, "z" punch-in 1.12 (hides jump cuts), "push" slow push-in (B-roll), "c" close-up
-SPAN = (0.0, 67.3)  # one continuous clip
-segs = [("pg", 0.0, 67.3, "shift")]  # close framing: shift down so the pills clear her eyes
+SPAN = (0.0, 65.0)  # end in the pause after "...dekat link I-SIHAT." (the raw file cuts off mid-sentence after this)
+segs = [("pg", 0.0, 65.0, "shift")]  # close framing: shift down so the pills clear her eyes
 # timeline position of each segment
 tl, t = [], 0.0
 for s in segs:
@@ -195,7 +195,7 @@ def pill(num, text):
 PILLS = [(6.94, 10.1, "1", "Braces untuk budak je?"), (10.14, 21.2, "1", "Dewasa pun boleh pakai!"),
          (21.36, 24.95, "2", "Lepas pasang tak perlu datang?"), (25.02, 42.6, "2", "Kena datang setiap bulan!"),
          (43.10, 46.9, "3", "Tak perlu retainer?"), (47.18, 59.7, "3", "Retainer paling penting!"),
-         (60.0, 67.2, "WA", "WhatsApp untuk tanya")]
+         (60.0, 64.9, "WA", "WhatsApp untuk tanya")]
 pill_ev = []
 for k, (a_, b_, n, txt) in enumerate(PILLS):
     im = pill(n, txt); fn = f"work/pill{k}.png"; im.save(fn)
@@ -390,7 +390,7 @@ fc += (
     f"[vo][mud][sfx]amix=inputs=3:duration=longest:normalize=0,alimiter=limit=0.89,"
     f"atrim=0:{TOTAL},afade=t=out:st={TOTAL-1.5}:d=1.5[au]"
 )
-OUT = "ISIHAT_PasirGudang_Braces_3SalahFaham_v1.mp4"
+OUT = "ISIHAT_PasirGudang_Braces_3SalahFaham_v2.mp4"
 run(f"ffmpeg -v error -y {' '.join(inputs)} -filter_complex \"{fc}\" -map \"[v]\" -map \"[au]\" -t {TOTAL} "
     f"-c:v libx264 -preset medium -crf 18 -profile:v high -pix_fmt yuv420p -r {FPS} "
     f"-c:a aac -b:a 192k -ar 48000 -movflags +faststart {OUT}")
